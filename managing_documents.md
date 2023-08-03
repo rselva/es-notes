@@ -1,44 +1,4 @@
-# Batch processing
-
-## Indexing documents
-
-```
-POST /_bulk
-{ "index": { "_index": "products", "_id": 200 } }
-{ "name": "Espresso Machine", "price": 199, "in_stock": 5 }
-{ "create": { "_index": "products", "_id": 201 } }
-{ "name": "Milk Frother", "price": 149, "in_stock": 14 }
-```
-
-## Updating and deleting documents
-
-```
-POST /_bulk
-{ "update": { "_index": "products", "_id": 201 } }
-{ "doc": { "price": 129 } }
-{ "delete": { "_index": "products", "_id": 200 } }
-```
-
-## Specifying the index name in the request path
-
-```
-POST /products/_bulk
-{ "update": { "_id": 201 } }
-{ "doc": { "price": 129 } }
-{ "delete": { "_id": 200 } }
-```
-
-## Retrieving all documents
-
-```
-GET /products/_search
-{
-  "query": {
-    "match_all": {}
-  }
-}
-```
-# Creating & Deleting Indices
+# 18. Creating & Deleting Indices
 
 ## Deleting an index
 
@@ -57,68 +17,7 @@ PUT /products
   }
 }
 ```
-# Delete by query
-
-## Deleting documents that match a given query
-
-```
-POST /products/_delete_by_query
-{
-  "query": {
-    "match_all": { }
-  }
-}
-```
-
-## Ignoring (counting) version conflicts
-
-The `conflicts` key may be added as a query parameter instead, i.e. `?conflicts=proceed`.
-
-```
-POST /products/_delete_by_query
-{
-  "conflicts": "proceed",
-  "query": {
-    "match_all": { }
-  }
-}
-```
-# Deleting documents
-
-```
-DELETE /products/_doc/101
-```
-# Importing data with cURL
-
-## Navigating to bulk file directory
-
-```
-cd /path/to/data/file/directory
-```
-
-### Examples
-```
-# macOS and Linux
-cd ~/Desktop
-
-# Windows
-cd C:\Users\[your_username]\Desktop
-```
-
-## Importing data into local cluster
-
-```
-curl --cacert [path_to_CA_certificate] -u elastic -H "Content-Type:application/x-ndjson" -XPOST https://localhost:9200/products/_bulk --data-binary "@products-bulk.json"
-
-# Skipping the verification of the certificate (only for local development)
-curl --insecure -u elastic -H "Content-Type:application/x-ndjson" -XPOST https://localhost:9200/products/_bulk --data-binary "@products-bulk.json"
-```
-
-## Importing data into Elastic Cloud
-```
-curl -H "Content-Type:application/x-ndjson" -XPOST -u username:password https://elastic-cloud-endpoint.com:9243/products/_bulk --data-binary "@products-bulk.json"
-```
-# Indexing documents
+# 19. Indexing documents
 
 ## Indexing document with auto generated ID:
 
@@ -141,38 +40,39 @@ PUT /products/_doc/100
   "in_stock": 4
 }
 ```
-# Optimistic concurrency control
 
-## Retrieve the document (and its primary term and sequence number)
+# 20. Retrieving documents by ID
+
 ```
 GET /products/_doc/100
 ```
 
-## Update the `in_stock` field only if the document has not been updated since retrieving it
+# 21. Updating documents
+
+## Updating an existing field
+
 ```
-POST /products/_update/100?if_primary_term=X&if_seq_no=X
+POST /products/_update/100
 {
   "doc": {
-    "in_stock": 123
+    "in_stock": 3
   }
 }
 ```
-# Replacing documents
+
+## Adding a new field
+
+_Yes, the syntax is the same as the above. ;-)_
 
 ```
-PUT /products/_doc/100
+POST /products/_update/100
 {
-  "name": "Toaster",
-  "price": 79,
-  "in_stock": 4
+  "doc": {
+    "tags": ["electronics"]
+  }
 }
 ```
-# Retrieving documents by ID
-
-```
-GET /products/_doc/100
-```
-# Scripted updates
+# 22. Scripted updates
 
 ## Reducing the current value of `in_stock` by one
 
@@ -258,7 +158,55 @@ POST /products/_update/100
   }
 }
 ```
-# Update by query
+# 23. Upserts
+
+```
+POST /products/_update/101
+{
+  "script": {
+    "source": "ctx._source.in_stock++"
+  },
+  "upsert": {
+    "name": "Blender",
+    "price": 399,
+    "in_stock": 5
+  }
+}
+```
+# 24. Replacing documents
+
+```
+PUT /products/_doc/100
+{
+  "name": "Toaster",
+  "price": 79,
+  "in_stock": 4
+}
+```
+# 25. Deleting documents
+
+```
+DELETE /products/_doc/101
+```
+
+# 30. Optimistic concurrency control
+
+## Retrieve the document (and its primary term and sequence number)
+```
+GET /products/_doc/100
+```
+
+## Update the `in_stock` field only if the document has not been updated since retrieving it
+```
+POST /products/_update/100?if_primary_term=X&if_seq_no=X
+{
+  "doc": {
+    "in_stock": 123
+  }
+}
+```
+
+# 31. Update by query
 
 ## Updating documents matching a query
 
@@ -303,43 +251,111 @@ GET /products/_search
   }
 }
 ```
-# Updating documents
 
-## Updating an existing field
+# 32. Delete by query
+
+## Deleting documents that match a given query
 
 ```
-POST /products/_update/100
+POST /products/_delete_by_query
 {
-  "doc": {
-    "in_stock": 3
+  "query": {
+    "match_all": { }
   }
 }
 ```
 
-## Adding a new field
+## Ignoring (counting) version conflicts
 
-_Yes, the syntax is the same as the above. ;-)_
+The `conflicts` key may be added as a query parameter instead, i.e. `?conflicts=proceed`.
 
 ```
-POST /products/_update/100
+POST /products/_delete_by_query
 {
-  "doc": {
-    "tags": ["electronics"]
+  "conflicts": "proceed",
+  "query": {
+    "match_all": { }
   }
 }
 ```
-# Upserts
+
+# 33. Batch processing
+
+## Indexing documents
 
 ```
-POST /products/_update/101
+POST /_bulk
+{ "index": { "_index": "products", "_id": 200 } }
+{ "name": "Espresso Machine", "price": 199, "in_stock": 5 }
+{ "create": { "_index": "products", "_id": 201 } }
+{ "name": "Milk Frother", "price": 149, "in_stock": 14 }
+```
+
+## Updating and deleting documents
+
+```
+POST /_bulk
+{ "update": { "_index": "products", "_id": 201 } }
+{ "doc": { "price": 129 } }
+{ "delete": { "_index": "products", "_id": 200 } }
+```
+
+## Specifying the index name in the request path
+
+```
+POST /products/_bulk
+{ "update": { "_id": 201 } }
+{ "doc": { "price": 129 } }
+{ "delete": { "_id": 200 } }
+```
+
+## Retrieving all documents
+
+```
+GET /products/_search
 {
-  "script": {
-    "source": "ctx._source.in_stock++"
-  },
-  "upsert": {
-    "name": "Blender",
-    "price": 399,
-    "in_stock": 5
+  "query": {
+    "match_all": {}
   }
 }
 ```
+
+
+
+# 34. Importing data with cURL
+
+## Navigating to bulk file directory
+
+```
+cd /path/to/data/file/directory
+```
+
+### Examples
+```
+# macOS and Linux
+cd ~/Desktop
+
+# Windows
+cd C:\Users\[your_username]\Desktop
+```
+
+## Importing data into local cluster
+
+```
+curl --cacert [path_to_CA_certificate] -u elastic -H "Content-Type:application/x-ndjson" -XPOST https://localhost:9200/products/_bulk --data-binary "@products-bulk.json"
+
+# Skipping the verification of the certificate (only for local development)
+curl --insecure -u elastic -H "Content-Type:application/x-ndjson" -XPOST https://localhost:9200/products/_bulk --data-binary "@products-bulk.json"
+```
+
+## Importing data into Elastic Cloud
+```
+curl -H "Content-Type:application/x-ndjson" -XPOST -u username:password https://elastic-cloud-endpoint.com:9243/products/_bulk --data-binary "@products-bulk.json"
+```
+
+
+
+
+
+
+
