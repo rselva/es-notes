@@ -37,7 +37,8 @@ GET /products/_search
     "match_all": {}
   }
 }
-```# Creating & Deleting Indices
+```
+# Creating & Deleting Indices
 
 ## Deleting an index
 
@@ -55,7 +56,8 @@ PUT /products
     "number_of_replicas": 2
   }
 }
-```# Delete by query
+```
+# Delete by query
 
 ## Deleting documents that match a given query
 
@@ -80,11 +82,13 @@ POST /products/_delete_by_query
     "match_all": { }
   }
 }
-```# Deleting documents
+```
+# Deleting documents
 
 ```
 DELETE /products/_doc/101
-```# Importing data with cURL
+```
+# Importing data with cURL
 
 ## Navigating to bulk file directory
 
@@ -113,7 +117,8 @@ curl --insecure -u elastic -H "Content-Type:application/x-ndjson" -XPOST https:/
 ## Importing data into Elastic Cloud
 ```
 curl -H "Content-Type:application/x-ndjson" -XPOST -u username:password https://elastic-cloud-endpoint.com:9243/products/_bulk --data-binary "@products-bulk.json"
-```# Indexing documents
+```
+# Indexing documents
 
 ## Indexing document with auto generated ID:
 
@@ -135,7 +140,8 @@ PUT /products/_doc/100
   "price": 49,
   "in_stock": 4
 }
-```# Optimistic concurrency control
+```
+# Optimistic concurrency control
 
 ## Retrieve the document (and its primary term and sequence number)
 ```
@@ -150,7 +156,8 @@ POST /products/_update/100?if_primary_term=X&if_seq_no=X
     "in_stock": 123
   }
 }
-```# Replacing documents
+```
+# Replacing documents
 
 ```
 PUT /products/_doc/100
@@ -159,11 +166,13 @@ PUT /products/_doc/100
   "price": 79,
   "in_stock": 4
 }
-```# Retrieving documents by ID
+```
+# Retrieving documents by ID
 
 ```
 GET /products/_doc/100
-```# Scripted updates
+```
+# Scripted updates
 
 ## Reducing the current value of `in_stock` by one
 
@@ -248,7 +257,8 @@ POST /products/_update/100
     """
   }
 }
-```# Update by query
+```
+# Update by query
 
 ## Updating documents matching a query
 
@@ -292,7 +302,8 @@ GET /products/_search
     "match_all": {}
   }
 }
-```# Updating documents
+```
+# Updating documents
 
 ## Updating an existing field
 
@@ -316,7 +327,8 @@ POST /products/_update/100
     "tags": ["electronics"]
   }
 }
-```# Upserts
+```
+# Upserts
 
 ```
 POST /products/_update/101
